@@ -44,3 +44,12 @@ class Inception(nn.Module):
     def forward(self, x:Tensor) -> Tensor:
         outputs = self._forward(x)
         return t.cat(outputs)
+    
+
+class InceptionAux(nn.Module):
+    def __init__(self, in_channels:int, num_classes:int, dropout:float = 0.7, conv2d_blk: Optional[Callable[..., nn.Module]]=None) -> None:
+        super().__init__()
+        self.conv = conv2d_blk(in_channels, 128, kernel_size=(1,1))
+        self.fc1 = nn.Linear(2048, 1024)
+        self.fc2 = nn.Linear(1024, num_classes)
+        self.dropout = nn.Dropout(p=0.7)
