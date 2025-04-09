@@ -33,3 +33,14 @@ class Inception(nn.Module):
             conv_blk(in_channel, pool_proj, kernel_size=1)
         )
 
+    def _forward(self, x: Tensor) -> List[Tensor]:
+        branch1 = self.branch1(x)
+        branch2 = self.branch2(x)
+        branch3 = self.branch3(x)
+        branch4 = self.branch4(x)
+
+        return [branch1, branch2, branch3, branch4]
+    
+    def forward(self, x:Tensor) -> Tensor:
+        outputs = self._forward(x)
+        return t.cat(outputs)
