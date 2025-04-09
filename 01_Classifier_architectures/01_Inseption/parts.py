@@ -53,3 +53,12 @@ class InceptionAux(nn.Module):
         self.fc1 = nn.Linear(2048, 1024)
         self.fc2 = nn.Linear(1024, num_classes)
         self.dropout = nn.Dropout(p=0.7)
+
+    def forward(self, x:Tensor) -> Tensor:
+        x = F.adaptive_max_pool2d(x, (4,4))
+        x = self.conv(x)
+        x = t.flatten(x)
+        x = F.relu(self.fc1(x), inplace=True)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
