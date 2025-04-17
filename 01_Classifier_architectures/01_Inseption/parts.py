@@ -19,6 +19,8 @@ class Inception(nn.Module):
     def __init__(self, in_channel:int, ch1x1:int, ch3x3red:int, ch3x3:int, ch5x5red:int, ch5x5:int, pool_proj:int, conv_blk: Optional[Callable[..., nn.Module]] = None) -> None:
         # super(Inception, self).__init__()
         super().__init__()
+        if conv_blk is None:
+            conv_blk = basicConv2d
         self.branch1 = conv_blk(in_channel, ch1x1, kernel_size=(1,1))
         self.branch2 = nn.Sequential(
             conv_blk(in_channel, ch3x3red, kernel_size=(1)),
@@ -49,6 +51,8 @@ class Inception(nn.Module):
 class InceptionAux(nn.Module):
     def __init__(self, in_channels:int, num_classes:int, dropout:float = 0.7, conv2d_blk: Optional[Callable[..., nn.Module]]=None) -> None:
         super().__init__()
+        if conv2d_blk is None:
+            conv2d_blk = basicConv2d
         self.conv = conv2d_blk(in_channels, 128, kernel_size=(1,1))
         self.fc1 = nn.Linear(2048, 1024)
         self.fc2 = nn.Linear(1024, num_classes)
