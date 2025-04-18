@@ -3,6 +3,7 @@ from parts import basicConv2d, Inception, InceptionAux
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
+from torch import Tensor
 
 from typing import Optional, List, Callable, Any, Union, Tuple
 import warnings
@@ -65,3 +66,14 @@ class Inception(nn.Module):
                 elif isinstance(m, nn.BatchNorm2d):
                     nn.init.constant_(m.weight, 1)
                     nn.init.constant_(m.bias, 0)
+
+        def _transform_input(self, x:Tensor) -> Tensor:
+            if self.transform_input:
+                x_ch0 = t.unsqueeze(x[:, 0], 1) * (0.229 / 0.5) + (0.485 - 0.5) / 0.5
+                x_ch1 = t.unsqueeze(x[:, 1], 1) * (0.224 / 0.5) + (0.456 - 0.5) / 0.5
+                x_ch2 = t.unsqueeze(x[:, 2], 1) * (0.225 / 0.5) + (0.406 - 0.5) / 0.5
+                x = t.cat([x_ch0, x_ch1, x_ch2])
+            return x
+        
+        def _forward(self, x: Tensor) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
+            ...
