@@ -8,6 +8,10 @@ from torch import Tensor
 from typing import Optional, List, Callable, Any, Union, Tuple
 import warnings
 
+from collections import namedtuple
+
+GoogleNetOutputs = namedtuple("GoogleNetOutputs", ["logits", "aux_logits1", "aux_logits2"])
+GoogleNetOutputs.__annotations__ = {"logits": Tensor, "aux_logits1": Optional[Tensor], "aux_logits2": Optional[Tensor]}
 class Inception(nn.Module):
     def __init__(self, num_classes: int, aux_logit: bool, transform_input: bool,
                     init_weight: Optional[bool] = None, blocks: List[Callable[..., nn.Module]] = None,
