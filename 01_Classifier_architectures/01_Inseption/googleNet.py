@@ -76,4 +76,31 @@ class Inception(nn.Module):
             return x
         
         def _forward(self, x: Tensor) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
-            ...
+            x = self.conv1(x)
+            x = self.maxpool1(x)
+            x = self.conv2(x)
+            x = self.maxpool2(x)
+            x = self.inception3a(x)
+            x = self.inception3b(x)
+            x = self.maxpool3(x)
+            x = self.inception4a(x)
+            aux1: Optional[Tensor] = None
+            if self.aux1 is not None:
+                if self.training:
+                    aux1 = self.aux1(x)
+            x = self.inception4b(x)
+            x = self.inception4c(x)
+            x = self.inception4d(x)
+            aux2: Optional[Tensor] = None
+            if self.aux2 is not None:
+                if self.training:
+                    aux2 = self.aux2(x)
+            x = self.inception4e(x)
+            x = self.maxpool4(x)
+            x = self.inception5a(x)
+            x = self.inception5b(x)
+            x = self.avgpool(x)
+            x = t.flatten(x)
+            x = self.dropout(x)
+            x = self.fc(x)
+            return x, aux1, aux2
