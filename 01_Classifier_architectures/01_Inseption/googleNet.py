@@ -12,6 +12,7 @@ from collections import namedtuple
 
 GoogleNetOutputs = namedtuple("GoogleNetOutputs", ["logits", "aux_logits1", "aux_logits2"])
 GoogleNetOutputs.__annotations__ = {"logits": Tensor, "aux_logits1": Optional[Tensor], "aux_logits2": Optional[Tensor]}
+_googlenetOutputs = GoogleNetOutputs
 class Inception(nn.Module):
     def __init__(self, num_classes: int, aux_logit: bool, transform_input: bool,
                     init_weight: Optional[bool] = None, blocks: List[Callable[..., nn.Module]] = None,
@@ -108,3 +109,20 @@ class Inception(nn.Module):
         x = self.dropout(x)
         x = self.fc(x)
         return x, aux1, aux2
+
+    @t.jit.unused
+    def eager_output(self, x: Tensor, aux1: Tensor, aux2: Tensor) -> GoogleNetOutputs:
+        if self.training and self.aux_logit:
+            return _googlenetOutputs(x, aux1, aux2)
+        else:
+            return x
+    def forward(self, x: Tensor) -> GoogleNetOutputs:
+        x = self._transform_input(x)
+        x, aux1, aux2 = self._forward(x)
+        aux_defined = self.training and self.aux_logit
+        if t.jit.is_scripting():
+            if not aux_defined:
+                warnings.warn("Scripted GoogleNet will always return GoogleNetOuputs Tuple")
+            return GoogleNetOutputs(x, aux1, aux2)
+        else:
+            return self.eager_output(x, aux1, aux2)
