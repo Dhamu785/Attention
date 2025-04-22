@@ -23,12 +23,12 @@ class Inception(nn.Module):
             conv_blk = basicConv2d
         self.branch1 = conv_blk(in_channel, ch1x1, kernel_size=(1,1))
         self.branch2 = nn.Sequential(
-            conv_blk(in_channel, ch3x3red, kernel_size=(1)),
+            conv_blk(in_channel, ch3x3red, kernel_size=(1,1)),
             conv_blk(ch3x3red, ch3x3, kernel_size=(3,3), padding=1)
         )
         self.branch3 = nn.Sequential(
             conv_blk(in_channel, ch5x5red, kernel_size=(1,1)),
-            conv_blk(ch5x5red, ch5x5, kernel_size=(5,5), padding=1)
+            conv_blk(ch5x5red, ch5x5, kernel_size=(5,5), padding=2)
         )
         self.branch4 = nn.Sequential(
             nn.MaxPool2d(kernel_size=(3,3), stride=1, padding=1, ceil_mode=True),
@@ -45,7 +45,7 @@ class Inception(nn.Module):
     
     def forward(self, x:Tensor) -> Tensor:
         outputs = self._forward(x)
-        return t.cat(outputs)
+        return t.cat(outputs, 1)
     
 
 class InceptionAux(nn.Module):
@@ -61,7 +61,7 @@ class InceptionAux(nn.Module):
     def forward(self, x:Tensor) -> Tensor:
         x = F.adaptive_max_pool2d(x, (4,4))
         x = self.conv(x)
-        x = t.flatten(x)
+        x = t.flatten(x, 1)
         x = F.relu(self.fc1(x), inplace=True)
         x = self.dropout(x)
         x = self.fc2(x)

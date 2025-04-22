@@ -13,7 +13,9 @@ from collections import namedtuple
 GoogleNetOutputs = namedtuple("GoogleNetOutputs", ["logits", "aux_logits1", "aux_logits2"])
 GoogleNetOutputs.__annotations__ = {"logits": Tensor, "aux_logits1": Optional[Tensor], "aux_logits2": Optional[Tensor]}
 _googlenetOutputs = GoogleNetOutputs
-class Inception(nn.Module):
+
+__all__ = ['GoogleNet']
+class GoogleNet(nn.Module):
     __constants__ = ['aux_logit', 'transform_input']
     def __init__(self, num_classes: int, aux_logit: bool, transform_input: bool,
                     init_weight: Optional[bool] = None, blocks: List[Callable[..., nn.Module]] = None,
@@ -22,10 +24,10 @@ class Inception(nn.Module):
         if init_weight is None:
             warnings.warn("The score behaviours are different from the original GoogleNet", FutureWarning)
             init_weight = True
-        if len(blocks) != 3:
-            raise ValueError(f"Blocks length should be 3 instead of {len(blocks)}")
         if blocks is None:
             blocks = [basicConv2d, Inception, InceptionAux]
+        if len(blocks) != 3:
+            raise ValueError(f"Blocks length should be 3 instead of {len(blocks)}")
 
         conv_block = blocks[0]
         inception_block = blocks[1]
@@ -37,7 +39,7 @@ class Inception(nn.Module):
         self.conv1 = conv_block(3, 64, kernel_size=7, stride=2, padding=3)
         self.maxpool1 = nn.MaxPool2d(3, stride=2, ceil_mode=True)
         self.conv2 = conv_block(64, 64, kernel_size=1)
-        self.conv3 = conv_block(62, 192, kernel_size=3, padding=1)
+        self.conv3 = conv_block(64, 192, kernel_size=3, padding=1)
         self.maxpool2 = nn.MaxPool2d(3, stride=2, ceil_mode=True)
 
         self.inception3a = inception_block(192, 64, 96, 128, 16, 32, 32, basicConv2d)
@@ -49,7 +51,7 @@ class Inception(nn.Module):
         self.inception4c = inception_block(512, 128, 128, 256, 24, 64, 64, basicConv2d)
         self.inception4d = inception_block(512, 112, 144, 288, 32, 64, 64, basicConv2d)
         self.inception4e = inception_block(528, 256, 160, 320, 32, 128, 128, basicConv2d)
-        self.maxpool4 = nn.Maxpool2d(2, stride=2, ceil_mode=True)
+        self.maxpool4 = nn.MaxPool2d(2, stride=2, ceil_mode=True)
 
         self.inception5a = inception_block(832, 256, 160, 320, 32, 128, 128, basicConv2d)
         self.inception5b = inception_block(832, 384, 192, 384, 48, 128, 128, basicConv2d)
@@ -85,6 +87,7 @@ class Inception(nn.Module):
         x = self.conv1(x)
         x = self.maxpool1(x)
         x = self.conv2(x)
+        x = self.conv3(x)
         x = self.maxpool2(x)
         x = self.inception3a(x)
         x = self.inception3b(x)
@@ -106,7 +109,7 @@ class Inception(nn.Module):
         x = self.inception5a(x)
         x = self.inception5b(x)
         x = self.avgpool(x)
-        x = t.flatten(x)
+        x = t.flatten(x, 1)
         x = self.dropout(x)
         x = self.fc(x)
         return x, aux1, aux2
