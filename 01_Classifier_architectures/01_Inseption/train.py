@@ -1,5 +1,4 @@
 from googleNet import *
-from parts import basicConv2d
 import torch as t
 
 model = GoogleNet(num_classes=100, aux_logit=True, transform_input=False, init_weight=True)
