@@ -14,6 +14,7 @@ GoogleNetOutputs = namedtuple("GoogleNetOutputs", ["logits", "aux_logits1", "aux
 GoogleNetOutputs.__annotations__ = {"logits": Tensor, "aux_logits1": Optional[Tensor], "aux_logits2": Optional[Tensor]}
 _googlenetOutputs = GoogleNetOutputs
 class Inception(nn.Module):
+    __constants__ = ['aux_logit', 'transform_input']
     def __init__(self, num_classes: int, aux_logit: bool, transform_input: bool,
                     init_weight: Optional[bool] = None, blocks: List[Callable[..., nn.Module]] = None,
                     drop_out: float = 0.20, drop_out_aux: float = 0.70) -> None:
