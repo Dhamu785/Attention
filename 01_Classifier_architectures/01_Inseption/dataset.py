@@ -3,11 +3,12 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 from torch import Tensor
+import torch as t
 
-from typing import Tuple, Optional, Union, Callable
+from typing import Tuple, Optional, Callable
 
 class custom_data_prep(Dataset):
-    def __init__(self, root_dir: str, transform: Union[Callable[[Image.Image], Tensor], None]):
+    def __init__(self, root_dir: str, transform: Optional[Callable[[Image.Image], Tensor]]= None):
         self.root_dir = root_dir
         self.transform = transform
 
@@ -41,4 +42,4 @@ class custom_data_prep(Dataset):
         else:
             transformed: Tensor = self.to_tensor(image)
 
-        return transformed, lbl
+        return transformed, t.tensor(lbl, dtype=t.long)
