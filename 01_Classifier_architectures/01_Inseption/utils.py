@@ -27,6 +27,12 @@ class training:
         return acc
     
     def train(self, model: t.nn.Module, with_aux: bool = True):
+        train_loss = []
+        val_loss = []
+        train_accuracy = []
+        val_accuracy = []
+        best_loss = float('inf')
+        best_accuracy = 0
         for epoch in range(1, self.epochs+1):
             model.to(self.DEVICE)
             model.train()
@@ -62,6 +68,8 @@ class training:
             epoch_bar.close()
             train_ls /= total_train_batchs
             train_acc /= total_train_batchs
+            train_loss.append(train_ls)
+            train_accuracy.append(train_acc)
 
             model.eval()
             val_ls = 0
@@ -78,5 +86,12 @@ class training:
                     val_acc += acc.item()
             val_ls /= total_val_batchs
             val_acc /= total_val_batchs
-
+            val_loss.append(val_ls)
+            val_accuracy.apend(val_acc)
+            if val_ls < best_loss:
+                t.save(model.state_dict(), "best.pt")
+            if epoch == self.epochs:
+                t.save(model.state_dict(), "last.pt")
             print(f"{epoch} / {self.epochs} | train_ls = {train_ls:.4f} | train_acc = {train_acc:.4f} | val_ls = {val_ls:.4f} | val_acc = {val_acc:.4f}")
+
+            return (train_loss, train_accuracy, val_loss, val_accuracy)
