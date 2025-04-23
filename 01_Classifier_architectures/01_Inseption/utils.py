@@ -26,7 +26,7 @@ class training:
         acc = (predicted == true_val).float().mean()
         return acc
     
-    def train(self, model: t.nn.Module):
+    def train(self, model: t.nn.Module, with_aux: bool = True):
         for epoch in range(1, self.epochs+1):
             model.to(self.DEVICE)
             model.train()
@@ -43,7 +43,10 @@ class training:
                 with t.autocast(device_type=self.DEVICE):
                     preds, aux1, aux2 = model(x)
                     # 2. Calculate the loss
-                    ls = self.loss(preds, y) + self.loss(aux1, y) + self.loss(aux2, y)
+                    if with_aux:
+                        ls = self.loss(preds, y) + self.loss(aux1, y) + self.loss(aux2, y)
+                    else:
+                        ls = self.loss(preds, y)
                 acc = self._calc_acc(preds.detach().clone(), y)
                 # 3. Zero grad
                 self.optmiz.zero_grad()

@@ -26,5 +26,4 @@ loss = t.nn.CrossEntropyLoss()
 
 model_set = utils.training(optimizer=optimizer, train_loader=train_loader, val_loader=test_loader, epochs=5, loss=loss, device='cuda')
 # %%
-model_set.train(model=model)
-# %%
+model_set.train(model=model, with_aux=True)
