@@ -87,7 +87,7 @@ class training:
             val_ls /= total_val_batchs
             val_acc /= total_val_batchs
             val_loss.append(val_ls)
-            val_accuracy.apend(val_acc)
+            val_accuracy.append(val_acc)
             if val_ls < best_loss:
                 t.save(model.state_dict(), "best.pt")
             if epoch == self.epochs:
