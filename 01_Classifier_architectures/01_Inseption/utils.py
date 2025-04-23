@@ -94,4 +94,4 @@ class training:
                 t.save(model.state_dict(), "last.pt")
             print(f"{epoch} / {self.epochs} | train_ls = {train_ls:.4f} | train_acc = {train_acc:.4f} | val_ls = {val_ls:.4f} | val_acc = {val_acc:.4f}")
 
-            return (train_loss, train_accuracy, val_loss, val_accuracy)
+        return (train_loss, train_accuracy, val_loss, val_accuracy)
