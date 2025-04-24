@@ -47,11 +47,12 @@ class training:
 
                 # 1. Forward pass
                 with t.autocast(device_type=self.DEVICE):
-                    preds, aux1, aux2 = model(x)
                     # 2. Calculate the loss
                     if with_aux:
+                        preds, aux1, aux2 = model(x)
                         ls = self.loss(preds, y) + self.loss(aux1, y) + self.loss(aux2, y)
                     else:
+                        preds = model(x)
                         ls = self.loss(preds, y)
                 acc = self._calc_acc(preds.detach().clone(), y)
                 # 3. Zero grad
