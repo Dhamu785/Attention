@@ -55,3 +55,21 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
     
+    def _forward(self, x: t.Tensor) -> t.Tensor:
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+
+        x = self.avgpool(x)
+        x = t.flatten(x, 1)
+        x = self.fc(x)
+        
+        return x
+    
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        return self._forward(x=x)
