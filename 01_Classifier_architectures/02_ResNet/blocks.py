@@ -4,12 +4,12 @@ from typing import Callable, Optional
 
 __all__ = ['conv3x3', 'conv1x1', 'BasicBlock']
 
-def conv3x3(in_planes: int, out_planes: int, strides: int=1, groups: int=1, dilation: int=1) -> nn.Module:
+def conv3x3(in_planes: int, out_planes: int, strides: int=1, dilation: int=1) -> nn.Module:
     return nn.Conv2d(in_channels=in_planes, out_channels=out_planes, kernel_size=(3,3), stride=strides,
-                        padding=dilation, groups=groups, bias=False, dilation=dilation)
+                        padding=dilation, bias=False)
 
 def conv1x1(in_planes: int, out_planes: int, strides: int=1) -> nn.Module:
-    return nn.Conv2d(in_channels=in_planes, out_channels=out_planes, kernel_size=(1,1), stride=strides)
+    return nn.Conv2d(in_channels=in_planes, out_channels=out_planes, kernel_size=(1,1), stride=strides, bias=False)
 
 class BasicBlock(nn.Module):
     expansion: int=1
@@ -21,7 +21,7 @@ class BasicBlock(nn.Module):
         self.conv1 = conv3x3(in_planes=in_planes, out_planes=planes, strides=stride)
         self.bn1 = norm_layer(planes)
         self.relu = nn.ReLU(inplace=True)
-        self.conv2 = conv3x3(in_planes=in_planes, out_planes=planes)
+        self.conv2 = conv3x3(in_planes=planes, out_planes=planes)
         self.bn2 = norm_layer(planes)
         self.downsample = downsample
 
