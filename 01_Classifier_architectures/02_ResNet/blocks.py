@@ -35,7 +35,7 @@ class BasicBlock(nn.Module):
         # out = self.relu(out)
 
         if self.downsample is not None:
-            identy = self.downsample(out)
+            identy = self.downsample(identy)
         
         out += identy
         out = self.relu(out)
