@@ -38,3 +38,20 @@ class ResNet(nn.Module):
             for m in self.modules():
                 if isinstance(m, BasicBlock) and m.bn2.weight is not None:
                     nn.init.constant_(m.bn2.weight, 0)
+
+    def _make_layer(self, block: type[Union[BasicBlock]], planes: int, blocks: int, stride: int=1) -> nn.Sequential:
+        norm_layer = self._norm_layer
+        downsample = None
+        if stride != 1 or self.in_planes != planes:
+            downsample = nn.Sequential(
+                conv1x1(in_planes=self.in_planes, out_planes=planes, strides=stride),
+                norm_layer(planes)
+            )
+        layers = nn.ModuleList()
+        layers.append(block(in_planes=self.in_planes, planes=planes, stride=stride, downsample=downsample, norm_layer=norm_layer))
+        self.in_planes = planes * block.expansion
+        for _ in range(1, blocks):
+            layers.append(block(in_planes=self.in_planes, planes=planes, norm_layer=norm_layer))
+
+        return nn.Sequential(*layers)
+    
