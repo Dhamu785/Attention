@@ -47,7 +47,7 @@ class ResNet(nn.Module):
                 conv1x1(in_planes=self.in_planes, out_planes=planes, strides=stride),
                 norm_layer(planes)
             )
-        layers = nn.ModuleList()
+        layers = list()
         layers.append(block(in_planes=self.in_planes, planes=planes, stride=stride, downsample=downsample, norm_layer=norm_layer))
         self.in_planes = planes * block.expansion
         for _ in range(1, blocks):
