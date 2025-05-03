@@ -89,7 +89,7 @@ class train:
                 t.save(model.state_dict(), 'best-res.pt')
             if epoch == self.epochs:
                 t.save(model.state_dict(), 'last-res.pt')
-            print(f"{epoch}/{self.epochs} | train_ls = {train_loss} | train_acc = {train_acc} | test_ls = {test_loss} | test_acc = {test_acc}")
+            print(f"{epoch}/{self.epochs} | train_ls = {bth_train_ls} | train_acc = {bth_train_acc} | test_ls = {bth_val_ls} | test_acc = {bth_val_acc}")
 
         if lrshed:
             return (train_loss, train_acc, test_loss, test_acc, learning_rates)
