@@ -14,7 +14,7 @@ class custom_data_prep(Dataset):
 
         self.classes = sorted(os.listdir(root_dir))
         self.class_to_idx = {idx : cls_name for idx, cls_name in enumerate(self.classes)}
-        self.cls_to_idx = {idx : cls_name for idx, cls_name in enumerate(self.classes)}
+        self.cls_to_idx = {cls_name : idx for idx, cls_name in enumerate(self.classes)}
 
         self.img_paths = []
         self.labels = []
