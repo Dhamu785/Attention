@@ -24,7 +24,7 @@ class custom_data_prep(Dataset):
             transforms.ToTensor()
         ])
 
-        for cls_n in self.calsses:
+        for cls_n in self.classes:
             fldr_fls = os.listdir(os.path.join(root_dir, cls_n))
             for file in fldr_fls:
                 self.img_paths.appedn(os.path.join(root_dir, cls_n, file))
