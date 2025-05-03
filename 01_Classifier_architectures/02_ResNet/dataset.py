@@ -30,16 +30,16 @@ class custom_data_prep(Dataset):
                 self.img_paths.append(os.path.join(root_dir, cls_n, file))
                 self.labels.append(self.cls_to_idx[cls_n])
 
-        def __len__(self) -> int:
-            return len(self.labels)
-        
-        def __getitem__(self, index: int) -> Tuple[Tensor, int]:
-            img_pth = self.img_paths[index]
-            lbl = self.labels[index]
-            pil_img = Image.open(img_pth)
+    def __len__(self) -> int:
+        return len(self.labels)
+    
+    def __getitem__(self, index: int) -> Tuple[Tensor, int]:
+        img_pth = self.img_paths[index]
+        lbl = self.labels[index]
+        pil_img = Image.open(img_pth)
 
-            if self.transforms:
-                transformed = self.transforms(pil_img)
-            else:
-                transformed = self.to_tensor(pil_img)
-            return (transformed, t.tensor(lbl, dtype=t.long))
+        if self.transforms:
+            transformed = self.transforms(pil_img)
+        else:
+            transformed = self.to_tensor(pil_img)
+        return (transformed, t.tensor(lbl, dtype=t.long))
