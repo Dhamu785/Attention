@@ -1,10 +1,7 @@
 import torch as t
 from torch import Tensor
 from torch.optim import Optimizer
-from torch.utils.data import DataLoader, random_split
-import torch.nn.functional as F
-
-from dataset import custom_data_prep
+from torch.utils.data import DataLoader
 
 from tqdm import tqdm
 from typing import Callable
