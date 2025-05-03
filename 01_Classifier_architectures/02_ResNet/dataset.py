@@ -36,7 +36,7 @@ class custom_data_prep(Dataset):
     def __getitem__(self, index: int) -> Tuple[Tensor, int]:
         img_pth = self.img_paths[index]
         lbl = self.labels[index]
-        pil_img = Image.open(img_pth)
+        pil_img = Image.open(img_pth).convert('RGB')
 
         if self.transforms:
             transformed = self.transforms(pil_img)
