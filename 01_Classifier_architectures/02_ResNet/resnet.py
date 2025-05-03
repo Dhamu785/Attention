@@ -1,4 +1,4 @@
-from .blocks import *
+from .blocks import BasicBlock, conv1x1
 
 import torch as t
 import torch.nn as nn
