@@ -49,6 +49,7 @@ class train:
 
                 with t.autocast(device_type=self.DEVICE):
                     preds = model(x)
+                    print(preds.shape)
                     ls = self.loss(preds, y)
                 acc = self._calc_acc(preds.detach().clone(), y)
                 self.optimizer.zero_grad()
