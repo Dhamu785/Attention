@@ -1,4 +1,4 @@
-from blocks import *
+from .blocks import *
 
 import torch as t
 import torch.nn as nn

@@ -1,4 +1,4 @@
-from parts import basicConv2d, Inception, InceptionAux
+from .parts import basicConv2d, Inception, InceptionAux
 
 import torch as t
 import torch.nn as nn
