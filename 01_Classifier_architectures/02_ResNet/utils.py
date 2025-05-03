@@ -61,7 +61,7 @@ class train:
                 epoch_bar.update(1)
             if lrshed:
                 lrshed.step()
-                learning_rates.append(lrshed.get_lr()[0])
+                learning_rates.append(lrshed.get_last_lr()[0])
             epoch_bar.close()
             bth_train_acc /= train_len
             bth_train_ls /= train_len
