@@ -2,10 +2,13 @@ import torch as t
 from torch import Tensor
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
-import torch.nn.functional as F
+
 
 from tqdm import tqdm
-from typing import Callable, Tuple, List
+from typing import Callable, Tuple, List, Dict
+
+from PIL import Image
+import matplotlib.pyplot as plt
 
 class train:
     def __init__(self, optimizer: Optimizer, train_loader: DataLoader,
@@ -90,3 +93,13 @@ class train:
             return (train_loss, train_acc, test_loss, test_acc, learning_rates)
         else:
             return (train_loss, train_acc, test_loss, test_acc)
+
+def plot(imgs: List[Tensor], predictions: Tensor, true: Tensor, lbl: Dict[str,int]) -> None:
+    plt.figure(figsize=(10, 10))
+    for i in range(1, 26):
+        plt.subplot(5, 5, i)
+        plt.imshow(imgs[i-1].permute(1,2,0).cpu().numpy())
+        plt.text(0, 512, lbl[true[i-1]], backgroundcolor='black', fontsize=12, color='green')
+        plt.text(0, 512, lbl[predictions[i-1]], backgroundcolor='black', fontsize=12, color='white')
+        plt.axis('off')
+    plt.show()

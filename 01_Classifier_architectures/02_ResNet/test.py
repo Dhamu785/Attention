@@ -1,15 +1,10 @@
 # %% import libaries
-from resnet import ResNet
-from blocks import *
-import torch as t
+import matplotlib.pyplot as plt
 
-# %% call resnet
-model = ResNet(BasicBlock, [2,2,2,2], 100, True)
 # %%
-test_data = t.randn((4,3,244,244))
-res = model(test_data)
-# %%
-print(res)
-# %%
-res.shape
+plt.plot(range(512))
+plt.text(0,512, 'test', backgroundcolor='black', color='white', style='normal')
+plt.text(50,512, 'test', backgroundcolor='black', color='green', style='normal', fontsize=12)
+
+plt.show()
 # %%
