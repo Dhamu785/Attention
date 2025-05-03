@@ -77,7 +77,6 @@ class train:
                 with t.inference_mode():
                     with t.autocast(device_type=self.DEVICE):
                         val_preds = model(x)
-                        print(val_preds.shape)
                         ls = self.loss(val_preds, y)
                         acc = self._calc_acc(val_preds, y)
                     bth_val_ls += ls.item()
