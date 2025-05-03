@@ -53,7 +53,7 @@ class train:
                 acc = self._calc_acc(preds.detach().clone(), y)
                 self.optimizer.zero_grad()
                 self.scalar.scale(ls).backward()
-                self.scalar.scale(self.optimizer)
+                self.scalar.step(self.optimizer)
                 self.scalar.update()
                 bth_train_ls += ls.item()
                 bth_train_acc += acc.item()
