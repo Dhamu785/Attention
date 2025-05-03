@@ -73,7 +73,7 @@ class train:
             bth_val_acc = 0
             for batch in self.test_loader:
                 x = batch[0].to(self.DEVICE)
-                y = batch[0].to(self.DEVICE)
+                y = batch[1].to(self.DEVICE)
                 with t.inference_mode():
                     with t.autocast(device_type=self.DEVICE):
                         val_preds = model(x)
