@@ -27,7 +27,7 @@ class custom_data_prep(Dataset):
         for cls_n in self.classes:
             fldr_fls = os.listdir(os.path.join(root_dir, cls_n))
             for file in fldr_fls:
-                self.img_paths.appedn(os.path.join(root_dir, cls_n, file))
+                self.img_paths.append(os.path.join(root_dir, cls_n, file))
                 self.labels.append(self.cls_to_idx[cls_n])
 
         def __len__(self) -> int:
