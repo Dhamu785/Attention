@@ -49,7 +49,6 @@ class train:
 
                 with t.autocast(device_type=self.DEVICE):
                     preds = model(x)
-                    print(preds.shape)
                     ls = self.loss(preds, y)
                 acc = self._calc_acc(preds.detach().clone(), y)
                 self.optimizer.zero_grad()
@@ -58,6 +57,8 @@ class train:
                 self.scalar.update()
                 bth_train_ls += ls.item()
                 bth_train_acc += acc.item()
+                epoch_bar.set_postfix(loss=ls.item(), accuracy=acc.item())
+                epoch_bar.update(1)
             if lrshed:
                 lrshed.step()
                 learning_rates.append(lrshed.get_lr()[0])
@@ -76,6 +77,7 @@ class train:
                 with t.inference_mode():
                     with t.autocast(device_type=self.DEVICE):
                         val_preds = model(x)
+                        print(preds.shape)
                         ls = self.loss(val_preds, y)
                         acc = self._calc_acc(val_preds, y)
                     bth_val_ls += ls.item()
