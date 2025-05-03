@@ -14,6 +14,7 @@ class custom_data_prep(Dataset):
 
         self.classes = sorted(os.listdir(root_dir))
         self.class_to_idx = {idx : cls_name for idx, cls_name in enumerate(self.classes)}
+        self.cls_to_idx = {idx : cls_name for idx, cls_name in enumerate(self.classes)}
 
         self.img_paths = []
         self.labels = []
@@ -27,7 +28,7 @@ class custom_data_prep(Dataset):
             fldr_fls = os.listdir(os.path.join(root_dir, cls_n))
             for file in fldr_fls:
                 self.img_paths.appedn(os.path.join(root_dir, cls_n, file))
-                self.labels.append(self.class_to_idx[cls_n])
+                self.labels.append(self.cls_to_idx[cls_n])
 
         def __len__(self) -> int:
             return len(self.labels)
