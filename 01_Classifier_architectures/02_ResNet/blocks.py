@@ -2,7 +2,7 @@ import torch as t
 import torch.nn as nn
 from typing import Callable, Optional
 
-__all__ = ['conv3x3', 'conv1x1', 'BasicBlock']
+# __all__ = ['conv3x3', 'conv1x1', 'BasicBlock']
 
 def conv3x3(in_planes: int, out_planes: int, strides: int=1, dilation: int=1) -> nn.Module:
     return nn.Conv2d(in_channels=in_planes, out_channels=out_planes, kernel_size=(3,3), stride=strides,
