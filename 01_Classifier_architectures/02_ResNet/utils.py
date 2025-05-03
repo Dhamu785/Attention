@@ -27,7 +27,7 @@ class train:
         acc = (predictions == true_val).float().mean()
         return acc
     
-    def train(self, model: t.nn.Module, lrshed: bool=False) -> Tuple[List[float],...]:
+    def train_model(self, model: t.nn.Module, lrshed: bool=False) -> Tuple[List[float],...]:
         train_loss = []
         train_acc = []
         test_loss = []
@@ -42,7 +42,7 @@ class train:
             bth_train_acc = 0
             train_len = len(self.train_loader)
             test_len = len(self.test_loader)
-            epoch_bar = tqdm(range(len(train_len)), desc="Batch processing", unit="Batchs", colour='GREEN')
+            epoch_bar = tqdm(range(train_len), desc="Batch processing", unit="Batchs", colour='GREEN')
             for batch in self.train_loader:
                 x = batch[0].to(self.DEVICE)
                 y = batch[1].to(self.DEVICE)
