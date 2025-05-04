@@ -87,9 +87,9 @@ class training:
             val_loss.append(val_ls)
             val_accuracy.append(val_acc)
             if val_ls < best_loss:
-                t.save(model.state_dict(), "best.pt")
+                t.save(model.state_dict(), "best-inceptionv1.pt")
             if epoch == self.epochs:
-                t.save(model.state_dict(), "last.pt")
+                t.save(model.state_dict(), "last-inceptionv1.pt")
             print(f"{epoch} / {self.epochs} | train_ls = {train_ls:.4f} | train_acc = {train_acc:.4f} | val_ls = {val_ls:.4f} | val_acc = {val_acc:.4f}")
 
         return (train_loss, train_accuracy, val_loss, val_accuracy)

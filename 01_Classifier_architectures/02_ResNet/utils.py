@@ -23,7 +23,7 @@ class train:
         self.scalar = t.GradScaler(device=device)
 
     def _calc_acc(self, pred_logits: Tensor, true_val: Tensor) -> float:
-        predictions = t.argmax(t.softmax(pred_logits, 1))
+        predictions = t.argmax(pred_logits, 1)
         acc = (predictions == true_val).float().mean()
         return acc
     
@@ -89,7 +89,7 @@ class train:
                 t.save(model.state_dict(), 'best-res.pt')
             if epoch == self.epochs:
                 t.save(model.state_dict(), 'last-res.pt')
-            print(f"{epoch}/{self.epochs} | train_ls = {bth_train_ls} | train_acc = {bth_train_acc} | test_ls = {bth_val_ls} | test_acc = {bth_val_acc}")
+            print(f"{epoch}/{self.epochs} | train_ls = {bth_train_ls:.4f} | train_acc = {bth_train_acc:.4f} | test_ls = {bth_val_ls:.4f} | test_acc = {bth_val_acc:.4f}")
 
         if lrshed:
             return (train_loss, train_acc, test_loss, test_acc, learning_rates)
