@@ -97,11 +97,15 @@ class train:
             return (train_loss, train_acc, test_loss, test_acc)
 
 def plot(imgs: List[Tensor], predictions: Tensor, true: Tensor, lbl: Dict[str,int]) -> None:
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(20, 20))
     for i in range(1, 26):
         plt.subplot(5, 5, i)
         plt.imshow(imgs[i-1].permute(1,2,0).cpu().numpy())
-        plt.text(0, 512, lbl[true[i-1]], backgroundcolor='black', fontsize=12, color='green')
-        plt.text(0, 512, lbl[predictions[i-1]], backgroundcolor='black', fontsize=12, color='white')
+        true_lbl = lbl[true[i-1]]
+        pred_lbl = lbl[predictions[i-1]]
+        if true_lbl == pred_lbl:
+            plt.title(f"{pred_lbl}", color='green')
+        else:
+            plt.title(f"act: {true_lbl}\npred: {pred_lbl}", color='red')
         plt.axis('off')
     plt.show()
