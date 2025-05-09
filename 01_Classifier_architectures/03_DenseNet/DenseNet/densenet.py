@@ -1,5 +1,7 @@
 import torch as t
 import torch.nn as nn
+from torch import Tensor
+import torch.utils.checkpoint as cp
 
 class _layers(nn.Module):
     def __init__(self, in_features: int, bn_size: int, growth_rate: int, drop_rate: float, memory_efficiency: bool) -> None:
@@ -14,3 +16,20 @@ class _layers(nn.Module):
 
         self.drop_rate = drop_rate
         self.memory_efficiency = memory_efficiency
+
+    def bottle_necks(self, inputs: list[Tensor]) -> Tensor:
+        con_feat = t.cat(inputs, 1)
+        btl_nk = self.conv1(self.relu1(self.norm1(con_feat)))
+        return btl_nk
+    
+    def any_requires_grad(self, inputs: list[Tensor]) -> bool:
+        for ins in inputs:
+            if ins.requires_grad:
+                return True
+        return False
+    
+    def check_point(self, inputs: list[Tensor]) -> Tensor:
+        def clouser(*feat_in):
+            return self.bottle_necks(feat_in)
+        return cp.checkpoint(clouser, *inputs, use_reentrant=False)
+    
