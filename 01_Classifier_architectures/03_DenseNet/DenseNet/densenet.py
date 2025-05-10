@@ -107,3 +107,12 @@ class denseNet(nn.Module):
         self.layers.add_module('norm-final', nn.BatchNorm2d(num_features=num_features))
 
         self.classifier = nn.Linear(num_features, num_classes)
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.layers(x)
+        x = F.relu(x, inplace=True)
+        x = F.adaptive_avg_pool2d(x, (1,1))
+        x = t.flatten(x)
+        x = self.classifier(x)
+
+        return x
