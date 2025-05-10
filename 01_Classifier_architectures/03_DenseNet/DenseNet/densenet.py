@@ -65,3 +65,11 @@ class _block(nn.ModuleDict):
             out_feat = layer(features)
             features.append(out_feat)
         return t.cat(features, 1)
+
+class _transition(nn.Sequential):
+    def __init__(self, input_features: int, out_features: int) -> Tensor:
+        super().__init__()
+        self.norm = nn.BatchNorm2d(input_features)
+        self.relu = nn.ReLU(inplace=True)
+        self.conv = nn.Conv2d(input_features, out_features, kernel_size=1, stride=1, bias=False)
+        self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
