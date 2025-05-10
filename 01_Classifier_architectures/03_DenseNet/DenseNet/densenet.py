@@ -51,3 +51,17 @@ class _layers(nn.Module):
             out3x3 = F.dropout(out3x3, self.drop_rate, training=self.training)
 
         return out3x3
+    
+class _block(nn.ModuleDict):
+    def __init__(self, num_layers: int, input_feat: int, bn_size: int, growth_rate: int, memory_efficienct: bool, drop_rate: float) -> None:
+        super().__init__()
+        for i in range(num_layers):
+            layer = _layers(input_feat, bn_size, growth_rate, drop_rate, memory_efficienct)
+            self.add_module(f'denselayer {i+1}', layer)
+
+    def forward(self, input_features: Tensor) -> Tensor:
+        features = [input_features]
+        for name, layer in self.items():
+            out_feat = layer(features)
+            features.append(out_feat)
+        return t.cat(features, 1)
