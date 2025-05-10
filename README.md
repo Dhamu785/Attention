@@ -16,6 +16,7 @@
    1. self.modules()
    2. self.training
 4. Model train with scale and autocast
+5. Auxilary connection
 ### 02. ResNet
 1. Learning rate shedular
 2. isinstance based weight init and more
