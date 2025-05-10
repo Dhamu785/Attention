@@ -4,6 +4,8 @@ from torch import Tensor
 import torch.utils.checkpoint as cp
 import torch.nn.functional as F
 
+from collections import OrderedDict
+
 class _layers(nn.Module):
     def __init__(self, in_features: int, bn_size: int, growth_rate: int, drop_rate: float, memory_efficiency: bool) -> None:
         super().__init__()
@@ -56,8 +58,8 @@ class _block(nn.ModuleDict):
     def __init__(self, num_layers: int, input_feat: int, bn_size: int, growth_rate: int, memory_efficienct: bool, drop_rate: float) -> None:
         super().__init__()
         for i in range(num_layers):
-            layer = _layers(input_feat, bn_size, growth_rate, drop_rate, memory_efficienct)
-            self.add_module(f'denselayer {i+1}', layer)
+            layer = _layers(input_feat*i*growth_rate, bn_size, growth_rate, drop_rate, memory_efficienct)
+            self.add_module(f'denselayer-{i+1}', layer)
 
     def forward(self, input_features: Tensor) -> Tensor:
         features = [input_features]
@@ -75,4 +77,33 @@ class _transition(nn.Sequential):
         self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
 
 class denseNet(nn.Module):
-    def __init__(self, )
+    def __init__(self, block_config: tuple[int, int, int, int], num_classes: int, growth_rate: int = 32, bn_size: int = 4, drop_rate: float=0.2, 
+                    initial_features: int = 64, memory_effiency: bool = True) -> None:
+        super().__init__()
+
+        self.layers = nn.Sequential(
+            OrderedDict([
+                ('conv0', nn.Conv2d(3, initial_features, kernel_size=7, stride=2, padding=3, bias=False)),
+                ('norm0', nn.BatchNorm2d(initial_features)),
+                ('relu0', nn.ReLU(inplace=True)),
+                ('pool0', nn.MaxPool2d(kernel_size=3, padding=1, stride=2))
+            ])
+        )
+
+        # Adding dense block to above layers
+        num_features = initial_features
+        for i, num_layers in enumerate(block_config):
+            block = _block(num_layers=num_layers, input_feat=num_features, bn_size=bn_size, growth_rate=growth_rate, memory_efficienct=memory_effiency, drop_rate=drop_rate)
+            self.layers.add_module(f"denseblock-{i+1}", block)
+
+            num_features = initial_features + growth_rate * num_layers
+
+            if i != len(block_config) - 1:
+                transition_layer = _transition(num_features, num_features//2)
+                self.layers.add_module(f'transition-{i+1}', transition_layer)
+                num_features = num_features // 2
+
+        # final batch norm
+        self.layers.add_module('norm-final', nn.BatchNorm2d(num_features=num_features))
+
+        self.classifier = nn.Linear(num_features, num_classes)
