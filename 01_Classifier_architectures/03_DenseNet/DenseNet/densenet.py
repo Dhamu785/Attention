@@ -58,7 +58,7 @@ class _block(nn.ModuleDict):
     def __init__(self, num_layers: int, input_feat: int, bn_size: int, growth_rate: int, memory_efficienct: bool, drop_rate: float) -> None:
         super().__init__()
         for i in range(num_layers):
-            layer = _layers(input_feat*i*growth_rate, bn_size, growth_rate, drop_rate, memory_efficienct)
+            layer = _layers(input_feat+i*growth_rate, bn_size, growth_rate, drop_rate, memory_efficienct)
             self.add_module(f'denselayer-{i+1}', layer)
 
     def forward(self, input_features: Tensor) -> Tensor:
@@ -112,7 +112,7 @@ class denseNet(nn.Module):
         x = self.layers(x)
         x = F.relu(x, inplace=True)
         x = F.adaptive_avg_pool2d(x, (1,1))
-        x = t.flatten(x)
+        x = t.flatten(x, 1)
         x = self.classifier(x)
 
         return x
