@@ -83,7 +83,7 @@ class train:
             bth_val_ls /= test_len
             bth_val_acc /= test_len
             test_loss.append(bth_val_ls)
-            test_acc.append(bth_train_acc)
+            test_acc.append(bth_val_acc)
             if bth_val_ls < best_loss:
                 t.save(model.state_dict(), 'best-res.pt')
             if epoch == self.epochs:
