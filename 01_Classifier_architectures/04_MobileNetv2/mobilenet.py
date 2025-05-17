@@ -31,3 +31,28 @@ class inverted_residual(nn.Module):
             return x + self.conv(x)
         else:
             return self.conv(x)
+        
+class mobilenetv2(nn.Module):
+    def __init__(self, num_class: int, width_mul: float, inverted_residual_setting: Optional[list[list[int]]]=None,
+                    round_nearest: int = 8, block: Optional[Callable[..., nn.Module]] = None, normlayer: Optional[Callable[..., nn.Module]] = None) -> None:
+        super().__init__()
+
+        if block is None:
+            block = inverted_residual
+        if normlayer is None:
+            normlayer = nn.BatchNorm2d
+        if inverted_residual_setting is None:
+            inverted_residual_setting = [
+                # t, c, n, s
+                [1, 16, 1, 1],
+                [6, 24, 2, 2],
+                [6, 32, 3, 2],
+                [6, 64, 4, 2],
+                [6, 96, 3, 1],
+                [6, 160, 3, 2],
+                [6, 320, 1, 1],
+            ]
+        if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
+            raise "Issue in inverted residual setting"
+        input_channels =32
+        last_channel = 32
