@@ -18,7 +18,7 @@ class inverted_residual(nn.Module):
         layers: list[nn.Module] = []
 
         if exp_rate != 1:
-            layers.append(Conv2dNormActivation(inp, hidden_dim, 1, norm_layer=normlayer, activation_layer=nn.ReLU6))
+            layers.append(Conv2dNormActivation(inp, hidden_dim, kernel_size=1, norm_layer=normlayer, activation_layer=nn.ReLU6))
         layers.extend([
             Conv2dNormActivation(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim, norm_layer=normlayer, activation_layer=nn.ReLU6),
             nn.Conv2d(hidden_dim, out, 1, 1, 0, bias=False),
