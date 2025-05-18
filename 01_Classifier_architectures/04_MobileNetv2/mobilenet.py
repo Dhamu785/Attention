@@ -31,7 +31,15 @@ class inverted_residual(nn.Module):
             return x + self.conv(x)
         else:
             return self.conv(x)
-        
+
+def make_divisible(v: int, divisor: int, min_val: Optional[int] = None) -> int:
+    if min_val is None:
+        min_val = divisor
+    new_v = max(min_val, int(v + divisor/2)//divisor*divisor)
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
+
 class mobilenetv2(nn.Module):
     def __init__(self, num_class: int, width_mul: float, inverted_residual_setting: Optional[list[list[int]]]=None,
                     round_nearest: int = 8, block: Optional[Callable[..., nn.Module]] = None, normlayer: Optional[Callable[..., nn.Module]] = None) -> None:
