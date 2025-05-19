@@ -85,9 +85,9 @@ class train:
             test_loss.append(bth_val_ls)
             test_acc.append(bth_val_acc)
             if bth_val_ls < best_loss:
-                t.save(model.state_dict(), 'best-res.pt')
+                t.save(model.state_dict(), 'best-mobile.pt')
             if epoch == self.epochs:
-                t.save(model.state_dict(), 'last-res.pt')
+                t.save(model.state_dict(), 'last-mobile.pt')
             print(f"{epoch}/{self.epochs} | train_ls = {bth_train_ls:.4f} | train_acc = {bth_train_acc:.4f} | test_ls = {bth_val_ls:.4f} | test_acc = {bth_val_acc:.4f}")
 
         if lrshed:
