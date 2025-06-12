@@ -7,7 +7,11 @@ class ConvBlock(nn.Module):
                     bias: bool, bn_eps: float = 1e-5, activation: Union[Callable[..., t.Tensor], str] = (lambda: nn.ReLU(inplace=True))) -> None:
         super().__init__()
 
-        self.conv = nn.Conv2d()
+        self.activation = activation is None
+        self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride, padding=padding, dilation=dilation, groups=groups, bias=bias)
+        self.bn = nn.BatchNorm2d(num_features=out_channels, eps=bn_eps)
+        if self.activation:
+            self.activ = activation
 
 
 def conv3x3_block(in_chennels: int, out_chennels: int, stride: int, padding: int, dilation: int = 1, groups: int = 1, bias: bool = False,
