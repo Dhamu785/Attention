@@ -15,3 +15,16 @@ class init_block(nn.Module):
     def forward(self, x) -> t.Tensor:
         x = self.conv1(self.conv2(self.conv3(self.pool(x))))
         return x
+    
+class SE_Net(nn.Module):
+    def __init__(self, channels: list[list], init_block_channels: int, cardinality: int, bottleneck_width: int, in_channels: int = 3, in_size = (224, 224), num_classes=100) -> None:
+        super().__init__()
+        self.in_size = in_size
+        self.num_class = num_classes
+
+        self.features = nn.Sequential()
+        self.features.add_module('init_block', init_block(in_channel=in_channels, out_channel=init_block_channels))
+        in_channels = init_block_channels
+
+        for i, channels_per_stage in enumerate(channels):
+            stage = nn.Sequential()
