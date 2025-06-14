@@ -88,4 +88,15 @@ class SE_Net(nn.Module):
             identy_conv3x3 = (i != 0)
             for j, out_channels in enumerate(channels_per_stage):
                 stride = 2 if (j == 0) and (i != 0) else 1
-                stages.add_module()
+                stages.add_module(f'Unit-{j+1}', SENetUnit(in_channel=in_channels, out_channel=out_channels, stride=stride,
+                                                            bottleneck_width=bottleneck_width, identity_conv3x3=identy_conv3x3,
+                                                            cardinality=cardinality))
+                in_channels = out_channels
+            self.features.add_module(f'Stage-{i+1}', stages)
+            self.features.add_module('final_pool', nn.AvgPool2d(kernel_size=7, padding=1))
+            
+            self.output = nn.Sequential()
+            self.output.add_module('dropout', nn.Dropout(p=0.2))
+            self.add_module('classifier head', nn.Linear(in_features=in_channels, out_features=num_classes))
+
+            self._init_params()
