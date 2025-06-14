@@ -1,5 +1,7 @@
 import torch as t
 from torch import nn
+import torch.nn.init as init
+
 from blocks import conv3x3_block, conv1x1_block
 from typing import Optional, Union, Callable
 from utils import get_activation
@@ -100,3 +102,12 @@ class SE_Net(nn.Module):
             self.add_module('classifier head', nn.Linear(in_features=in_channels, out_features=num_classes))
 
             self._init_params()
+
+    def _init_params(self):
+        for name, module in self.named_modules():
+            if isinstance(module, nn.Conv2d):
+                init.kaiming_uniform_(module.weight)
+                if module.bias is not None:
+                    init.constant_(module.bias, 0)
+
+    
