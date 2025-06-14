@@ -55,7 +55,24 @@ class SENetUnit(nn.Module):
         self.resize_identity = (in_channel != out_channel) or (stride != 1)
 
         self.body = bottleneck(in_channel=in_channel, out_channel=out_channel, stride=stride, cardinality=cardinality, bottleneck_width=bottleneck_width)
+        self.se = SEblock(channels=out_channel)
+
+        if self.resize_identity:
+            if identity_conv3x3:
+                self.identity_conv = conv3x3_block(in_channels=in_channel, out_channels=out_channel, stride=stride, activation=None)
+            else:
+                self.identity_conv = conv1x1_block(in_channels=in_channel, out_channels=out_channel, stride=stride, activation=None)
         
+        self.activ = nn.ReLU(inplace=True)
+
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        if self.resize_identity:
+            identity = self.identity_conv(x)
+        else:
+            identity = x
+        return self.activ(identity + self.se(self.body(x)))
+
+
 class SE_Net(nn.Module):
     def __init__(self, channels: list[list], init_block_channels: int, cardinality: int, bottleneck_width: int, in_channels: int = 3, in_size = (224, 224), num_classes=100) -> None:
         super().__init__()
