@@ -47,7 +47,7 @@ class SEblock(nn.Module):
         self.sigmoid = nn.Sigmoid() if approx_sigmoid else nn.Sigmoid()
 
     def forward(self, x: t.Tensor) -> t.Tensor:
-        return self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
+        return x * self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
 
 class SENetUnit(nn.Module):
     def __init__(self, in_channel: int, out_channel: int, stride: int, bottleneck_width: int, identity_conv3x3: bool, cardinality: int) -> None:
