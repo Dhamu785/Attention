@@ -1,15 +1,17 @@
 import torch as t
 from torch import nn
-from blocks import conv3x3_block
+from blocks import conv3x3_block, conv1x1_block
+
+import math
 
 class init_block(nn.Module):
     def __init__(self, in_channel: int, out_channel: int) -> None:
         super().__init__()
         mid_channel = out_channel // 2
 
-        self.conv1 = conv3x3_block(in_chennels=in_channel, out_chennels=mid_channel, stride=2)
-        self.conv2 = conv3x3_block(in_channel=mid_channel, out_chennels=mid_channel)
-        self.conv3 = conv3x3_block(in_channel=mid_channel, out_chennels=out_channel)
+        self.conv1 = conv3x3_block(in_channels=in_channel, out_channels=mid_channel, stride=2)
+        self.conv2 = conv3x3_block(in_channels=mid_channel, out_channels=mid_channel)
+        self.conv3 = conv3x3_block(in_channels=mid_channel, out_channels=out_channel)
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
     def forward(self, x) -> t.Tensor:
@@ -17,15 +19,20 @@ class init_block(nn.Module):
         return x
 
 class bottleneck(nn.Module):
-    def __init__(self, in_chennel: int, out_channel: int, stride: int, cardinality: int, bottleneck_width: int) -> None:
+    def __init__(self, in_channel: int, out_channel: int, stride: int, cardinality: int, bottleneck_width: int) -> None:
         super().__init__()
+        mid_channel = out_channel // 2
+        D = int(math.floor(mid_channel * (bottleneck_width / 64.0)))
+        group_width = cardinality * D
+        group_width2 = group_width // 2
+
 
 class SENetUnit(nn.Module):
     def __init__(self, in_channel: int, out_channel: int, stride: int, bottleneck_width: int, identity_conv3x3: bool, cardinality: int) -> None:
         super().__init__()
         self.resize_identity = (in_channel != out_channel) or (stride != 1)
 
-        self.body = bottleneck(in_chennel=in_channel, out_channel=out_channel, stride=stride, cardinality=cardinality, bottleneck_width=bottleneck_width)
+        self.body = bottleneck(in_channel=in_channel, out_channel=out_channel, stride=stride, cardinality=cardinality, bottleneck_width=bottleneck_width)
         
 class SE_Net(nn.Module):
     def __init__(self, channels: list[list], init_block_channels: int, cardinality: int, bottleneck_width: int, in_channels: int = 3, in_size = (224, 224), num_classes=100) -> None:
