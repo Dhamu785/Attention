@@ -15,7 +15,18 @@ class init_block(nn.Module):
     def forward(self, x) -> t.Tensor:
         x = self.conv1(self.conv2(self.conv3(self.pool(x))))
         return x
-    
+
+class bottleneck(nn.Module):
+    def __init__(self, in_chennel: int, out_channel: int, stride: int, cardinality: int, bottleneck_width: int) -> None:
+        super().__init__()
+
+class SENetUnit(nn.Module):
+    def __init__(self, in_channel: int, out_channel: int, stride: int, bottleneck_width: int, identity_conv3x3: bool, cardinality: int) -> None:
+        super().__init__()
+        self.resize_identity = (in_channel != out_channel) or (stride != 1)
+
+        self.body = bottleneck(in_chennel=in_channel, out_channel=out_channel, stride=stride, cardinality=cardinality, bottleneck_width=bottleneck_width)
+        
 class SE_Net(nn.Module):
     def __init__(self, channels: list[list], init_block_channels: int, cardinality: int, bottleneck_width: int, in_channels: int = 3, in_size = (224, 224), num_classes=100) -> None:
         super().__init__()
@@ -27,4 +38,8 @@ class SE_Net(nn.Module):
         in_channels = init_block_channels
 
         for i, channels_per_stage in enumerate(channels):
-            stage = nn.Sequential()
+            stages = nn.Sequential()
+            identy_conv3x3 = (i != 0)
+            for j, out_channels in enumerate(channels_per_stage):
+                stride = 2 if (j == 0) and (i != 0) else 1
+                stages.add_module()
