@@ -17,8 +17,7 @@ class init_block(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
     def forward(self, x) -> t.Tensor:
-        x = self.conv1(self.conv2(self.conv3(self.pool(x))))
-        return x
+        return self.pool(self.conv3(self.conv2(self.conv1(x))))
 
 class bottleneck(nn.Module):
     def __init__(self, in_channel: int, out_channel: int, stride: int, cardinality: int, bottleneck_width: int) -> None:
@@ -33,8 +32,7 @@ class bottleneck(nn.Module):
         self.conv3 = conv1x1_block(in_chennels=group_width, out_channels=out_channel)
     
     def forward(self, x: t.Tensor) -> t.Tensor:
-        x = self.conv1(self.conv2(self.conv3(x)))
-        return x
+        return self.conv3(self.conv2(self.conv1(x)))
 
 class SEblock(nn.Module):
     def __init__(self, channels: int, reduction: int = 16, approx_sigmoid: bool = False, 
