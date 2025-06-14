@@ -26,6 +26,10 @@ class bottleneck(nn.Module):
         group_width = cardinality * D
         group_width2 = group_width // 2
 
+        self.conv1 = conv1x1_block(in_channel=in_channel, out_channels=group_width2)
+        self.conv2 = conv3x3_block(in_channels=group_width2, out_channels=group_width, stride=stride, groups=cardinality)
+        self.conv3 = conv1x1_block(in_chennels=group_width, out_channels=out_channel)
+
 
 class SENetUnit(nn.Module):
     def __init__(self, in_channel: int, out_channel: int, stride: int, bottleneck_width: int, identity_conv3x3: bool, cardinality: int) -> None:

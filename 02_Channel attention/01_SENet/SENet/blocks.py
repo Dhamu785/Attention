@@ -21,7 +21,7 @@ class ConvBlock(nn.Module):
         return x
 
 
-def conv3x3_block(in_channels: int, out_channels: int, stride: int, padding: int, dilation: int = 1, groups: int = 1, bias: bool = False,
+def conv3x3_block(in_channels: int, out_channels: int, stride: int = 1, padding: int = 1, dilation: int = 1, groups: int = 1, bias: bool = False,
                     bn_eps: float = 1e-5, activation: Optional[Union[Callable[..., t.Tensor], str]] = (lambda: nn.ReLU(inplace=True))) -> nn.Module:
 
     return ConvBlock(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=stride, padding=padding, dilation=dilation, groups=groups,
