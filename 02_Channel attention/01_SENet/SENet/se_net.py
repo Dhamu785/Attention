@@ -29,6 +29,10 @@ class bottleneck(nn.Module):
         self.conv1 = conv1x1_block(in_channel=in_channel, out_channels=group_width2)
         self.conv2 = conv3x3_block(in_channels=group_width2, out_channels=group_width, stride=stride, groups=cardinality)
         self.conv3 = conv1x1_block(in_chennels=group_width, out_channels=out_channel)
+    
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        x = self.conv1(self.conv2(self.conv3(x)))
+        return x
 
 
 class SENetUnit(nn.Module):
