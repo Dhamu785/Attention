@@ -110,4 +110,7 @@ class SE_Net(nn.Module):
                 if module.bias is not None:
                     init.constant_(module.bias, 0)
 
-    
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        x = self.features(x)
+        x = self.output(x.view(x.size(0), -1))
+        return x
