@@ -1,6 +1,8 @@
 import torch as t
 from torch import nn
 from blocks import conv3x3_block, conv1x1_block
+from typing import Optional, Union, Callable
+from utils import get_activation
 
 import math
 
@@ -34,6 +36,20 @@ class bottleneck(nn.Module):
         x = self.conv1(self.conv2(self.conv3(x)))
         return x
 
+class SEblock(nn.Module):
+    def __init__(self, channels: int, reduction: int = 16, approx_sigmoid: bool = False, 
+                    activation: Optional[Union[Callable[..., t.Tensor], str]] = (lambda: nn.ReLU(inplace=True))) -> None:
+        super().__init__()
+        mid_channels = channels // reduction
+
+        self.pool = nn.AdaptiveAvgPool2d(output_size=1)
+        self.conv1 = conv1x1_block(in_chennels=channels, out_channels=mid_channels, bias=True)
+        self.activ = get_activation(activation)
+        self.conv2 = conv1x1_block(in_chennels=mid_channels, out_channels=channels, bias=True)
+        self.sigmoid = nn.Sigmoid() if approx_sigmoid else nn.Sigmoid()
+
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        return self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
 
 class SENetUnit(nn.Module):
     def __init__(self, in_channel: int, out_channel: int, stride: int, bottleneck_width: int, identity_conv3x3: bool, cardinality: int) -> None:
