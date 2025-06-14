@@ -2,7 +2,7 @@ import torch as t
 from torch import nn
 import torch.nn.init as init
 
-from blocks import conv3x3_block, conv1x1_block
+from .blocks import conv3x3_block, conv1x1_block
 from typing import Optional, Union, Callable
 from utils import get_activation
 
@@ -29,9 +29,9 @@ class bottleneck(nn.Module):
         group_width = cardinality * D
         group_width2 = group_width // 2
 
-        self.conv1 = conv1x1_block(in_channel=in_channel, out_channels=group_width2)
+        self.conv1 = conv1x1_block(in_channels=in_channel, out_channels=group_width2)
         self.conv2 = conv3x3_block(in_channels=group_width2, out_channels=group_width, stride=stride, groups=cardinality)
-        self.conv3 = conv1x1_block(in_chennels=group_width, out_channels=out_channel)
+        self.conv3 = conv1x1_block(in_channels=group_width, out_channels=out_channel)
     
     def forward(self, x: t.Tensor) -> t.Tensor:
         return self.conv3(self.conv2(self.conv1(x)))
@@ -43,9 +43,9 @@ class SEblock(nn.Module):
         mid_channels = channels // reduction
 
         self.pool = nn.AdaptiveAvgPool2d(output_size=1)
-        self.conv1 = conv1x1_block(in_chennels=channels, out_channels=mid_channels, bias=True)
+        self.conv1 = conv1x1_block(in_channels=channels, out_channels=mid_channels, bias=True)
         self.activ = get_activation(activation)
-        self.conv2 = conv1x1_block(in_chennels=mid_channels, out_channels=channels, bias=True)
+        self.conv2 = conv1x1_block(in_channels=mid_channels, out_channels=channels, bias=True)
         self.sigmoid = nn.Sigmoid() if approx_sigmoid else nn.Sigmoid()
 
     def forward(self, x: t.Tensor) -> t.Tensor:
@@ -61,13 +61,14 @@ class SENetUnit(nn.Module):
 
         if self.resize_identity:
             if identity_conv3x3:
-                self.identity_conv = conv3x3_block(in_channels=in_channel, out_channels=out_channel, stride=stride, activation=None)
+                self.identity_conv = conv3x3_block(in_channels=in_channel, out_channels=out_channel, stride=stride)
             else:
-                self.identity_conv = conv1x1_block(in_channels=in_channel, out_channels=out_channel, stride=stride, activation=None)
+                self.identity_conv = conv1x1_block(in_channels=in_channel, out_channels=out_channel, stride=stride)
         
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x: t.Tensor) -> t.Tensor:
+        print(x.shape)
         if self.resize_identity:
             identity = self.identity_conv(x)
         else:
@@ -95,13 +96,13 @@ class SE_Net(nn.Module):
                                                             cardinality=cardinality))
                 in_channels = out_channels
             self.features.add_module(f'Stage-{i+1}', stages)
-            self.features.add_module('final_pool', nn.AvgPool2d(kernel_size=7, padding=1))
+        self.features.add_module('final_pool', nn.AvgPool2d(kernel_size=7, padding=1))
             
-            self.output = nn.Sequential()
-            self.output.add_module('dropout', nn.Dropout(p=0.2))
-            self.add_module('classifier head', nn.Linear(in_features=in_channels, out_features=num_classes))
+        self.output = nn.Sequential()
+        self.output.add_module('dropout', nn.Dropout(p=0.2))
+        self.output.add_module('classifier head', nn.Linear(in_features=in_channels, out_features=num_classes))
 
-            self._init_params()
+        self._init_params()
 
     def _init_params(self):
         for name, module in self.named_modules():
@@ -112,5 +113,4 @@ class SE_Net(nn.Module):
 
     def forward(self, x: t.Tensor) -> t.Tensor:
         x = self.features(x)
-        x = self.output(x.view(x.size(0), -1))
-        return x
+        return self.output(x.view(x.size(0), -1))

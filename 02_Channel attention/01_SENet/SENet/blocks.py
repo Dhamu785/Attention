@@ -3,8 +3,8 @@ from torch import nn
 from typing import Optional, Callable, Union
 
 class ConvBlock(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int, padding: int, dilation: int, groups: int, 
-                    bias: bool, bn_eps: float = 1e-5, activation: Union[Callable[..., t.Tensor], str] = (lambda: nn.ReLU(inplace=True))) -> None:
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int, padding: int, dilation: int = 1, groups: int=1, 
+                    bias: bool=False, bn_eps: float = 1e-5, activation: Union[Callable[..., t.Tensor], str] = (lambda: nn.ReLU(inplace=True))) -> None:
         super().__init__()
 
         self.activation = activation is None
@@ -27,6 +27,6 @@ def conv3x3_block(in_channels: int, out_channels: int, stride: int = 1, padding:
     return ConvBlock(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=stride, padding=padding, dilation=dilation, groups=groups,
                             bias=bias, bn_eps=bn_eps, activation=activation)
 
-def conv1x1_block(in_chennels: int, out_channels: int, stride: int = 1, padding: int = 1, groups: int = 1, 
+def conv1x1_block(in_channels: int, out_channels: int, stride: int = 1, padding: int = 0, groups: int = 1, 
                     bias: bool = False, bn_eps: float = 1e-5, activation: Optional[Union[Callable[..., t.Tensor], str]] = (lambda: nn.ReLU(inplace=True))) -> nn.Module:
-    return ConvBlock(in_channels=in_chennels, out_channels=out_channels, kernel_size=1, stride=stride, padding=padding, groups=groups, bias=bias, bn_eps=bn_eps, activation=activation)
+    return ConvBlock(in_channels=in_channels, out_channels=out_channels, kernel_size=1, stride=stride, padding=padding, groups=groups, bias=bias, bn_eps=bn_eps, activation=activation)
