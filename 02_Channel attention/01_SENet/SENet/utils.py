@@ -70,6 +70,7 @@ class training:
                 bth_train_ls += ls.item()
 
                 bar.set_postfix(loss=ls.item(), acc=acc.item())
+                bar.update(1)
             
             bar.close()
             train_acc.append(bth_train_acc/train_len)
