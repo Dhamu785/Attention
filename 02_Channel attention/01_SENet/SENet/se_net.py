@@ -43,9 +43,9 @@ class SEblock(nn.Module):
         mid_channels = channels // reduction
 
         self.pool = nn.AdaptiveAvgPool2d(output_size=1)
-        self.conv1 = conv1x1_block(in_channels=channels, out_channels=mid_channels, bias=True)
+        self.conv1 = nn.Conv2d(in_channels=channels, out_channels=mid_channels, kernel_size=1, stride=1, groups=1, bias=False)
         self.activ = get_activation(activation)
-        self.conv2 = conv1x1_block(in_channels=mid_channels, out_channels=channels, bias=True)
+        self.conv2 = nn.Conv2d(in_channels=mid_channels, out_channels=channels, kernel_size=1, stride=1, groups=1, bias=False)
         self.sigmoid = nn.Sigmoid() if approx_sigmoid else nn.Sigmoid()
 
     def forward(self, x: t.Tensor) -> t.Tensor:
