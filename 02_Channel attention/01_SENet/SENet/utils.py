@@ -25,7 +25,7 @@ def get_activation(act: Union[Callable[..., Callable], str]):
 
 class training:
     def __init__(self, train_dataloader: DataLoader,  test_dataloader: DataLoader, Epochs: int, optimizer: Optimizer, 
-                    loss_fn: Callable[[t.Tensor, t.Tensor], t.Tensor], device: str, sav_img: t.Tensor) -> None:
+                    loss_fn: Callable[[t.Tensor, t.Tensor], t.Tensor], device: str) -> None:
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
         self.epochs = Epochs
@@ -33,7 +33,6 @@ class training:
         self.loss_fn = loss_fn
         self.device = device
         self.scaler = t.GradScaler(device=device)
-        self.sav_img = sav_img
 
     def calc_acc(self, predictions: t.Tensor, y: t.Tensor) -> float:
         predictions = t.argmax(predictions, 1)
@@ -94,9 +93,6 @@ class training:
             
             test_loss.append(bth_test_ls/test_len)
             test_acc.append(bth_test_acc/test_len)
-            with t.inference_mode():
-                with t.autocast(device_type=self.device):
-                    preds = model(self.sav_img.to(self.device))
             print(f"{epoch} / {self.epochs} | train ls = {train_loss[-1]:.4f} | train acc = {train_acc[-1]:.4f} | test ls = {test_loss[-1]:.4f} | test acc = {test_acc[-1]:.4f}")
         
         return (train_loss, train_acc, test_loss, test_acc)
