@@ -55,7 +55,7 @@ class SEblock(nn.Module):
     def forward(self, x: t.Tensor) -> t.Tensor:
         X = x * self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
         if not self.training and len(x) == 6:
-            timestamp = datetime.now().strftime("%H%M%S")
+            timestamp = datetime.now().strftime("%H%M%S%s")
             np.save(f'./seIO/Inp_{timestamp}.npy', x.detach().cpu().numpy())
             np.save(f'./seIO/Outp_{timestamp}.npy', X.detach().cpu().numpy())
         return X
