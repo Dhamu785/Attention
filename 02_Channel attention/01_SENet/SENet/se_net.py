@@ -2,9 +2,9 @@ import torch as t
 from torch import nn
 import torch.nn.init as init
 
-from .blocks import conv3x3_block, conv1x1_block
+from SENet.blocks import conv3x3_block, conv1x1_block
 from typing import Optional, Union, Callable
-from utils import get_activation
+from SENet.utils import get_activation
 
 import math
 
@@ -68,7 +68,6 @@ class SENetUnit(nn.Module):
         self.activ = nn.ReLU(inplace=True)
 
     def forward(self, x: t.Tensor) -> t.Tensor:
-        print(x.shape)
         if self.resize_identity:
             identity = self.identity_conv(x)
         else:
