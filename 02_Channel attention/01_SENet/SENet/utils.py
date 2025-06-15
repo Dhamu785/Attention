@@ -94,7 +94,8 @@ class training:
             
             test_loss.append(bth_test_ls/test_len)
             test_acc.append(bth_test_acc/test_len)
-            t.save(model.state_dict(), f'{os.path.join(os.getcwd(), 'models')}/mdl-{epoch}.pt')
+            sav_loc = os.path.join(os.getcwd(), 'models')
+            t.save(model.state_dict(), f'{sav_loc}/mdl-{epoch}.pt')
             print(f"{epoch} / {self.epochs} | train ls = {train_loss[-1]:.4f} | train acc = {train_acc[-1]:.4f} | test ls = {test_loss[-1]:.4f} | test acc = {test_acc[-1]:.4f}")
         
         return (train_loss, train_acc, test_loss, test_acc)
