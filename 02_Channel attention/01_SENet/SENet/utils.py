@@ -3,9 +3,11 @@ from torch import nn
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
-from typing import Callable, Union
+from typing import Callable, Union, Dict
 from inspect import isfunction
 from tqdm import tqdm
+
+import matplotlib.pyplot as plt
 
 def get_activation(act: Union[Callable[..., Callable], str]):
     if isfunction(act):
@@ -94,3 +96,17 @@ class training:
             print(f"{epoch} / {self.epochs} | train ls = {train_loss[-1]:.4f} | train acc = {train_acc[-1]:.4f} | test ls = {test_loss[-1]:.4f} | test acc = {test_acc[-1]:.4f}")
         
         return (train_loss, train_acc, test_loss, test_acc)
+
+def plot(imgs: list[t.Tensor], predictions: t.Tensor, true: t.Tensor, lbl: Dict[str,int]) -> None:
+    plt.figure(figsize=(20, 20))
+    for i in range(1, 26):
+        plt.subplot(5, 5, i)
+        plt.imshow(imgs[i-1].permute(1,2,0).cpu().numpy())
+        true_lbl = lbl[true[i-1]]
+        pred_lbl = lbl[predictions[i-1]]
+        if true_lbl == pred_lbl:
+            plt.title(f"{pred_lbl}", color='green')
+        else:
+            plt.title(f"act: {true_lbl}\npred: {pred_lbl}", color='red')
+        plt.axis('off')
+    plt.show()
