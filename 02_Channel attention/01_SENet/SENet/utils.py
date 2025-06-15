@@ -84,7 +84,7 @@ class training:
                 lbl = lbl.to(self.device)
 
                 with t.inference_mode():
-                    with t.GradScaler(device=self.device):
+                    with t.autocast(device=self.device):
                         preds = model(data)
                         ls = self.loss_fn(preds, lbl)
                     acc = self.calc_acc(predictions=preds.detach().clone(), y=lbl)
