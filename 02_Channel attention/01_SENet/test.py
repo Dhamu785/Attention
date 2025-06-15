@@ -24,3 +24,10 @@ res = model(a)
 print(res.shape)
 
 # %%
+for n,m in model.named_children():
+    for nn,mm in m.named_children():
+        print(mm)
+        print("=============")
+        
+    break
+# %%
