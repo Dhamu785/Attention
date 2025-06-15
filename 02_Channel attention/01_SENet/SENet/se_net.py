@@ -7,10 +7,6 @@ from typing import Optional, Union, Callable
 from SENet.utils import get_activation
 
 import math
-import numpy as np
-
-from datetime import datetime
-import os
 
 class init_block(nn.Module):
     def __init__(self, in_channel: int, out_channel: int) -> None:
@@ -51,16 +47,9 @@ class SEblock(nn.Module):
         self.activ = get_activation(activation)
         self.conv2 = nn.Conv2d(in_channels=mid_channels, out_channels=channels, kernel_size=1, stride=1, groups=1, bias=False)
         self.sigmoid = nn.Sigmoid() if approx_sigmoid else nn.Sigmoid()
-        self.sav = 0
 
     def forward(self, x: t.Tensor) -> t.Tensor:
-        X = x * self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
-        if not self.training and len(x) == 6:
-            timestamp = datetime.now().strftime("%H%M%S")
-            self.sav+=1
-            np.save(f'./seIO/Inp_{timestamp}_{self.sav}.npy', x.detach().cpu().numpy())
-            np.save(f'./seIO/Outp_{timestamp}_{self.sav}.npy', X.detach().cpu().numpy())
-        return X
+        return x * self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
 
 class SENetUnit(nn.Module):
     def __init__(self, in_channel: int, out_channel: int, stride: int, bottleneck_width: int, identity_conv3x3: bool, cardinality: int) -> None:

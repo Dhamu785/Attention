@@ -3,7 +3,7 @@ import torch as t
 from SENet.se_net import SE_Net
 
 # %%
-a = t.randn((8, 3, 224,224))
+a = t.randn((6, 3, 224,224))
 a.shape
 
 # %%
@@ -22,12 +22,3 @@ model = SE_Net(channels=channels, init_block_channels=init_block_channels, cardi
                 in_channels=3)
 res = model(a)
 print(res.shape)
-
-# %%
-for n,m in model.named_children():
-    for nn,mm in m.named_children():
-        print(mm)
-        print("=============")
-        
-    break
-# %%
