@@ -41,6 +41,7 @@ class bottleneck(nn.Module):
         return self.conv3(self.conv2(self.conv1(x)))
 
 class SEblock(nn.Module):
+    sav = 0
     def __init__(self, channels: int, reduction: int = 16, approx_sigmoid: bool = False, 
                     activation: Optional[Union[Callable[..., t.Tensor], str]] = (lambda: nn.ReLU(inplace=True))) -> None:
         super().__init__()
@@ -56,8 +57,9 @@ class SEblock(nn.Module):
         X = x * self.sigmoid(self.conv2(self.activ(self.conv1(self.pool(x)))))
         if not self.training and len(x) == 6:
             timestamp = datetime.now().strftime("%H%M%S%s")
-            np.save(f'./seIO/Inp_{timestamp}.npy', x.detach().cpu().numpy())
-            np.save(f'./seIO/Outp_{timestamp}.npy', X.detach().cpu().numpy())
+            sav+=1
+            np.save(f'./seIO/Inp_{timestamp}_{sav}.npy', x.detach().cpu().numpy())
+            np.save(f'./seIO/Outp_{timestamp}_{sav}.npy', X.detach().cpu().numpy())
         return X
 
 class SENetUnit(nn.Module):
