@@ -11,10 +11,11 @@ class ConvBlock(nn.Module):
         )
 
     def forward(self, x: t.Tensor) -> t.Tensor:
-        return self.conv(x)
+        x = self.conv(x)
+        return x
     
 class CAM(nn.Module):
-    def __init__(self, in_channels: int, reduction_factor: int) -> None:
+    def __init__(self, in_channels: int, reduction_factor: int = 16) -> None:
         super().__init__()
         self.channels = in_channels
         self.reduction = reduction_factor
@@ -43,3 +44,41 @@ class SAM(nn.Module):
         maxx = t.max(x, 1)[0].unsqueeze(1)
         avg = t.mean(x, 1).unsqueeze(1)
         return nn.functional.sigmoid(self.conv(t.concat((maxx, avg), dim=1))) * x
+
+class cbam_net(nn.Module):
+    def __init__(self, in_channels: int, num_class: int) -> None:
+        super().__init__()
+        self.features = nn.Sequential()
+        self.features.add_module('Conv-1', ConvBlock(in_channels=in_channels, out_channels=24, kernel_size=3, stride=2, padding=1)) # 24,256,256
+        self.features.add_module('CAM-1', CAM(in_channels=24, reduction_factor=16))
+        self.features.add_module('SAM-1', SAM(bias=True))
+        self.features.add_module('Conv-2', ConvBlock(in_channels=24, out_channels=256, kernel_size=3, padding=1, stride=2)) # 256, 128, 128
+        self.features.add_module('CAM-2', CAM(in_channels=256))
+        self.features.add_module('SAM-2', SAM(bias=True))
+        self.features.add_module('Conv-3', ConvBlock(in_channels=256, out_channels=512, kernel_size=3, padding=1, stride=2)) # 512, 64, 64
+        self.features.add_module('CAM-3', CAM(in_channels=512))
+        self.features.add_module('SAM-3', SAM(bias=True))
+        self.features.add_module('Conv-4', ConvBlock(in_channels=512, out_channels=1024, kernel_size=3, padding=1, stride=2)) # 1024, 32, 32
+        self.features.add_module('CAM-4', CAM(in_channels=1024))
+        self.features.add_module('SAM-4', SAM(bias=True))
+        self.features.add_module('Conv-5', ConvBlock(in_channels=1024, out_channels=2048, kernel_size=3, padding=1, stride=5)) # 2048, 7, 7
+        self.features.add_module('CAM-5', CAM(in_channels=2048))
+        self.features.add_module('SAM-5', SAM(bias=True))
+        self.flatten = nn.Flatten(start_dim=1)
+
+        self.output = nn.Sequential(
+            nn.Linear(in_features=2048, out_features=1024),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.2, inplace=True),
+            nn.Linear(in_features=1024, out_features=512),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_features=512, out_features=256),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.2, inplace=True),
+            nn.Linear(in_features=256, out_features=num_class)
+        )
+
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        x = nn.functional.adaptive_avg_pool2d(self.features(x), (1,1))
+        x = self.flatten(x)
+        return self.output(x)
