@@ -1,8 +1,8 @@
 # %%
-from CBAM import CAM
+from CBAM import SAM
 
 # %%
-blk = CAM(8, 16)
+blk = SAM(False)
 # %%
 import torch as t
 # %%

@@ -38,3 +38,8 @@ class SAM(nn.Module):
         super().__init__()
         self.bias = bias
         self.conv = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=7, padding=3, bias=self.bias)
+
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        maxx = t.max(x, 1)[0].unsqueeze(1)
+        avg = t.mean(x, 1).unsqueeze(1)
+        return nn.functional.sigmoid(self.conv(t.concat((maxx, avg), dim=1))) * x
