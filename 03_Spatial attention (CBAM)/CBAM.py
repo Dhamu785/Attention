@@ -32,3 +32,9 @@ class CAM(nn.Module):
         linear_mean = self.linear(self.avg(x).view(b,c)).view(b,c,1,1)
         out = nn.functional.sigmoid(linear_max + linear_mean) * x
         return out
+
+class SAM(nn.Module):
+    def __init__(self, bias: bool) -> None:
+        super().__init__()
+        self.bias = bias
+        self.conv = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=7, padding=3, bias=self.bias)
