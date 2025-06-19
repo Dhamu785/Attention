@@ -25,3 +25,10 @@ class CAM(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(in_features=self.channels//self.reduction, out_features=self.channels)
         )
+
+    def forward(self, x: t.Tensor) -> t.Tensor:
+        b, c, _, _ = x.shape
+        linear_max = self.linear(self.max(x).view(b,c)).view(b,c,1,1)
+        linear_mean = self.linear(self.avg(x).view(b,c)).view(b,c,1,1)
+        out = nn.functional.sigmoid(linear_max + linear_mean) * x
+        return out
