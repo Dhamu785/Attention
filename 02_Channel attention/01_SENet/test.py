@@ -1,6 +1,7 @@
 # %% libs
 import torch as t
 from SENet.se_net import SE_Net
+from torch.utils.tensorboard import SummaryWriter
 
 # %%
 a = t.randn((6, 3, 224,224))
@@ -20,5 +21,13 @@ print(channels)
 
 model = SE_Net(channels=channels, init_block_channels=init_block_channels, cardinality=cardinality, bottleneck_width=bottleneck_width,
                 in_channels=3)
+
+# %%
+writer = SummaryWriter(log_dir='runs/test')
+
+# %%
+writer.add_graph(model, a)
+writer.close()
+# %%
 res = model(a)
 print(res.shape)
