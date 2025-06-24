@@ -18,4 +18,3 @@ res.shape
 # %%
 type(blk.features.Conv_1.conv)
 # %%
-t.nn.ModuleDict()

@@ -27,12 +27,14 @@ class CAM(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(in_features=self.channels//self.reduction, out_features=self.channels)
         )
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x: t.Tensor) -> t.Tensor:
         b, c, _, _ = x.shape
         linear_max = self.linear(self.max(x).view(b,c)).view(b,c,1,1)
         linear_mean = self.linear(self.avg(x).view(b,c)).view(b,c,1,1)
-        out = nn.functional.sigmoid(linear_max + linear_mean) * x
+        out = self.sigmoid(linear_max + linear_mean)
+        out = out * x
         return out
 
 class SAM(nn.Module):
@@ -40,11 +42,12 @@ class SAM(nn.Module):
         super().__init__()
         self.bias = bias
         self.conv = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=7, padding=3, bias=self.bias)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x: t.Tensor) -> t.Tensor:
         maxx = t.max(x, 1)[0].unsqueeze(1)
         avg = t.mean(x, 1).unsqueeze(1)
-        return nn.functional.sigmoid(self.conv(t.concat((maxx, avg), dim=1))) * x
+        return self.sigmoid(self.conv(t.concat((maxx, avg), dim=1))) * x
 
 class cbam_net(nn.Module):
     def __init__(self, in_channels: int, num_class: int) -> None:
