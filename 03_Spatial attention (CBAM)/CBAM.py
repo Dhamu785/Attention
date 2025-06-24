@@ -69,12 +69,12 @@ class cbam_net(nn.Module):
 
         self.output = nn.Sequential(
             nn.Linear(in_features=2048, out_features=1024),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(p=0.2, inplace=True),
             nn.Linear(in_features=1024, out_features=512),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Linear(in_features=512, out_features=256),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(p=0.2, inplace=True),
             nn.Linear(in_features=256, out_features=num_class)
         )
