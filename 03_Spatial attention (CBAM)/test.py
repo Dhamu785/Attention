@@ -11,8 +11,11 @@ x.shape
 # %%
 writer = SummaryWriter(log_dir='runs/test')
 writer.add_graph(blk, x)
-writer.add
+
 # %%
 res = blk(x)
 res.shape
 # %%
+type(blk.features.Conv_1.conv)
+# %%
+t.nn.ModuleDict()

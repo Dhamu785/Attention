@@ -1,14 +1,15 @@
 import torch as t
 import torch.nn as nn
+from collections import OrderedDict
 
 class ConvBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, **kwargs) -> None:
         super().__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, **kwargs),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True)
-        )
+        self.conv = nn.Sequential(OrderedDict([
+                    ('conv_layer', nn.Conv2d(in_channels=in_channels, out_channels=out_channels, **kwargs)),
+                    ('BatchNorm', nn.BatchNorm2d(out_channels)),
+                    ('activation', nn.ReLU(inplace=True))
+        ]))
 
     def forward(self, x: t.Tensor) -> t.Tensor:
         x = self.conv(x)
@@ -49,21 +50,21 @@ class cbam_net(nn.Module):
     def __init__(self, in_channels: int, num_class: int) -> None:
         super().__init__()
         self.features = nn.Sequential()
-        self.features.add_module('Conv-1', ConvBlock(in_channels=in_channels, out_channels=24, kernel_size=3, stride=2, padding=1)) # 24,256,256
-        self.features.add_module('CAM-1', CAM(in_channels=24, reduction_factor=16))
-        self.features.add_module('SAM-1', SAM(bias=True))
-        self.features.add_module('Conv-2', ConvBlock(in_channels=24, out_channels=256, kernel_size=3, padding=1, stride=2)) # 256, 128, 128
-        self.features.add_module('CAM-2', CAM(in_channels=256))
-        self.features.add_module('SAM-2', SAM(bias=True))
-        self.features.add_module('Conv-3', ConvBlock(in_channels=256, out_channels=512, kernel_size=3, padding=1, stride=2)) # 512, 64, 64
-        self.features.add_module('CAM-3', CAM(in_channels=512))
-        self.features.add_module('SAM-3', SAM(bias=True))
-        self.features.add_module('Conv-4', ConvBlock(in_channels=512, out_channels=1024, kernel_size=3, padding=1, stride=2)) # 1024, 32, 32
-        self.features.add_module('CAM-4', CAM(in_channels=1024))
-        self.features.add_module('SAM-4', SAM(bias=True))
-        self.features.add_module('Conv-5', ConvBlock(in_channels=1024, out_channels=2048, kernel_size=3, padding=1, stride=5)) # 2048, 7, 7
-        self.features.add_module('CAM-5', CAM(in_channels=2048))
-        self.features.add_module('SAM-5', SAM(bias=True))
+        self.features.add_module('Conv_1', ConvBlock(in_channels=in_channels, out_channels=24, kernel_size=3, stride=2, padding=1)) # 24,256,256
+        self.features.add_module('CAM_1', CAM(in_channels=24, reduction_factor=16))
+        self.features.add_module('SAM_1', SAM(bias=True))
+        self.features.add_module('Conv_2', ConvBlock(in_channels=24, out_channels=256, kernel_size=3, padding=1, stride=2)) # 256, 128, 128
+        self.features.add_module('CAM_2', CAM(in_channels=256))
+        self.features.add_module('SAM_2', SAM(bias=True))
+        self.features.add_module('Conv_3', ConvBlock(in_channels=256, out_channels=512, kernel_size=3, padding=1, stride=2)) # 512, 64, 64
+        self.features.add_module('CAM_3', CAM(in_channels=512))
+        self.features.add_module('SAM_3', SAM(bias=True))
+        self.features.add_module('Conv_4', ConvBlock(in_channels=512, out_channels=1024, kernel_size=3, padding=1, stride=2)) # 1024, 32, 32
+        self.features.add_module('CAM_4', CAM(in_channels=1024))
+        self.features.add_module('SAM_4', SAM(bias=True))
+        self.features.add_module('Conv_5', ConvBlock(in_channels=1024, out_channels=2048, kernel_size=3, padding=1, stride=5)) # 2048, 7, 7
+        self.features.add_module('CAM_5', CAM(in_channels=2048))
+        self.features.add_module('SAM_5', SAM(bias=True))
         self.flatten = nn.Flatten(start_dim=1)
 
         self.output = nn.Sequential(
