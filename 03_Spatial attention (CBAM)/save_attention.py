@@ -19,13 +19,8 @@ for i in img_lst:
     pil_lst.append(transform(Image.open(os.path.join('./sample', i))))
 
 input_t = t.from_numpy(np.array(pil_lst))
-# %%
-model = cbam_net(in_channels=3, num_class=6)
-model.load_state_dict(t.load(r"C:\Users\dhamu\Downloads\mdl-42.pt", map_location=DEVICE, weights_only=True))
 
 # %%
-layers = {'CAM':{}, 'SAM': {}}
-
 def inp(mdl, inp, out):
     layers['inputs'] = inp[0].detach().cpu()
 
@@ -34,19 +29,28 @@ def cam_out(mdl, inp, out):
 
 def sam_out(mdl, inp, out):
     layers['SAM']['output'] = out.detach().cpu()
-
 # %%
-cam_i = model.features.Conv_1.conv.activation.register_forward_hook(inp)
-cam_o = model.features.CAM_1.sigmoid.register_forward_hook(cam_out)
-sam_o = model.features.SAM_1.sigmoid.register_forward_hook(sam_out)
+model = cbam_net(in_channels=3, num_class=6)
+mdl_path = 'C:\\Users\\dhamu\\Downloads\\models'
 
-model(input_t)
+for pth in os.listdir(mdl_path):
+    epoch = pth.split('-')[1].split('.')[0]
+    model.load_state_dict(t.load(os.path.join(mdl_path, pth), map_location=DEVICE, weights_only=True))
+
+    layers = {'CAM':{}, 'SAM': {}}
+
+    cam_i = model.features.Conv_1.conv.activation.register_forward_hook(inp)
+    cam_o = model.features.CAM_1.sigmoid.register_forward_hook(cam_out)
+    sam_o = model.features.SAM_1.sigmoid.register_forward_hook(sam_out)
+
+    model.eval()
+    with t.inference_mode():
+        model(input_t)
+
+    with open(f'./hooks_info/hooks_info_{epoch}.pkl', 'wb') as f:
+        pkl.dump(layers,f)
 
 # %%
 print(f"SAM output shape = {layers['SAM']['output'].shape}")
 print(f"CAM output shape = {layers['CAM']['output'].shape}")
 print(f"Inputs shape = {layers['inputs'].shape}")
-
-# %%
-with open('hooks_info.pkl', 'wb') as f:
-    pkl.dump(layers,f)
