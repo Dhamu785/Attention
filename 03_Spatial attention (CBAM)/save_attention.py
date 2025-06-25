@@ -5,7 +5,7 @@ from PIL import Image
 import os
 import numpy as np
 from CBAM import cbam_net
-import matplotlib.pyplot as plt
+import pickle as pkl
 # %%
 DEVICE = 'cuda' if t.cuda.is_available() else 'cpu'
 transform = transforms.Compose([
@@ -21,7 +21,7 @@ for i in img_lst:
 input_t = t.from_numpy(np.array(pil_lst))
 # %%
 model = cbam_net(in_channels=3, num_class=6)
-# model.load_state_dict(t.load('a.pt', map_location=DEVICE, weights_only=True))
+model.load_state_dict(t.load(r"C:\Users\dhamu\Downloads\mdl-42.pt", map_location=DEVICE, weights_only=True))
 
 # %%
 layers = {'CAM':{}, 'SAM': {}}
@@ -43,8 +43,10 @@ sam_o = model.features.SAM_1.sigmoid.register_forward_hook(sam_out)
 model(input_t)
 
 # %%
-layers['SAM']['output'].shape
+print(f"SAM output shape = {layers['SAM']['output'].shape}")
+print(f"CAM output shape = {layers['CAM']['output'].shape}")
+print(f"Inputs shape = {layers['inputs'].shape}")
+
 # %%
-plt.imshow(layers['CAM']['input'].permute(1,2,0).numpy()[:,:,1], cmap='gray')
-plt.show()
-# %%
+with open('hooks_info.pkl', 'wb') as f:
+    pkl.dump(layers,f)
