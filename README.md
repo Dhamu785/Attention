@@ -25,3 +25,6 @@
 2. ModuleDict
    1. self.add_module() function
 3. nn.Sequential as class inheritance
+
+### 04. MobileNetv2
+1. Divisor rule
