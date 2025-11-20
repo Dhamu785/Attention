@@ -28,7 +28,7 @@
 #### 04. MobileNetv2
 1. <b>Divisor rule*</b>
 ### 02. Relu call
-- <b>relu activation call in parameter</b>
+- <b>relu activation call in parameter*</b>
 ### 03. CBAM*
 1. Hooks
 2. Tensorboard
