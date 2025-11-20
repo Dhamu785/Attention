@@ -27,6 +27,8 @@
 3. nn.Sequential as class inheritance
 #### 04. MobileNetv2
 1. <b>Divisor rule*</b>
-### 02. CBAM
+### 02. Relu call
+- relu activation call in parameter
+### 03. CBAM
 1. Hooks
 2. Tensorboard
